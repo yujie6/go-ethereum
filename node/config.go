@@ -62,7 +62,8 @@ type Config struct {
 	// registered services, instead those can use utility methods to create/access
 	// databases or flat files. This enables ephemeral nodes which can fully reside
 	// in memory.
-	DataDir string
+	DataDir       string
+	BlockNumPrint int64
 
 	// Configuration of peer-to-peer networking.
 	P2P p2p.Config

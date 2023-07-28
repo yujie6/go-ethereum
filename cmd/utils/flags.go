@@ -94,6 +94,12 @@ var (
 		Value:    flags.DirectoryString(node.DefaultDataDir()),
 		Category: flags.EthCategory,
 	}
+	BlockNumPrintFlag = &flags.BigFlag{
+		Name:     "blocknum",
+		Usage:    "Number of blocks to process",
+		Value:    big.NewInt(100),
+		Category: flags.LoggingCategory,
+	}
 	RemoteDBFlag = &cli.StringFlag{
 		Name:     "remotedb",
 		Usage:    "URL for remote database",
@@ -1374,6 +1380,7 @@ func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 	setWS(ctx, cfg)
 	setNodeUserIdent(ctx, cfg)
 	SetDataDir(ctx, cfg)
+	SetBlockNum(ctx, cfg)
 	setSmartCard(ctx, cfg)
 
 	if ctx.IsSet(JWTSecretFlag.Name) {
@@ -1447,6 +1454,10 @@ func SetDataDir(ctx *cli.Context, cfg *node.Config) {
 	case ctx.Bool(SepoliaFlag.Name) && cfg.DataDir == node.DefaultDataDir():
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "sepolia")
 	}
+}
+
+func SetBlockNum(ctx *cli.Context, cfg *node.Config) {
+	cfg.BlockNumPrint = ctx.Int64(BlockNumPrintFlag.Name)
 }
 
 func setGPO(ctx *cli.Context, cfg *gasprice.Config, light bool) {

@@ -67,6 +67,7 @@ func (n *proofList) Delete(key []byte) error {
 // commit states.
 type StateDB struct {
 	db         Database
+	printInfo  bool
 	prefetcher *triePrefetcher
 	trie       Trie
 	hasher     crypto.KeccakState
@@ -153,6 +154,7 @@ func New(root common.Hash, db Database, snaps *snapshot.Tree) (*StateDB, error) 
 	sdb := &StateDB{
 		db:                   db,
 		trie:                 tr,
+		printInfo:            false,
 		originalRoot:         root,
 		snaps:                snaps,
 		accounts:             make(map[common.Hash][]byte),
@@ -203,6 +205,14 @@ func (s *StateDB) setError(err error) {
 	if s.dbErr == nil {
 		s.dbErr = err
 	}
+}
+
+func (s *StateDB) GetPrintInfo() bool {
+	return s.printInfo
+}
+
+func (s *StateDB) SetPrintInfo(val bool) {
+	s.printInfo = val
 }
 
 // Error returns the memorized database failure occurred earlier.
@@ -348,6 +358,10 @@ func (s *StateDB) GetProof(addr common.Address) ([][]byte, error) {
 func (s *StateDB) GetProofByHash(addrHash common.Hash) ([][]byte, error) {
 	var proof proofList
 	err := s.trie.Prove(addrHash[:], &proof)
+	// fmt.Errorf(addrHash[:])
+	if s.printInfo {
+		fmt.Println("DumpProve: ", addrHash[:])
+	}
 	return proof, err
 }
 
@@ -362,6 +376,9 @@ func (s *StateDB) GetStorageProof(a common.Address, key common.Hash) ([][]byte, 
 	}
 	var proof proofList
 	err = trie.Prove(crypto.Keccak256(key.Bytes()), &proof)
+	if s.printInfo {
+		fmt.Println("DumpProve: ", crypto.Keccak256(key.Bytes()))
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -543,6 +560,10 @@ func (s *StateDB) updateStateObject(obj *stateObject) {
 	}
 	// Encode the account and update the account trie
 	addr := obj.Address()
+	// data, _ := rlp.EncodeToBytes(&obj.data)
+	if s.printInfo {
+		fmt.Println("DumpUpdate: ", addr)
+	}
 	if err := s.trie.UpdateAccount(addr, &obj.data); err != nil {
 		s.setError(fmt.Errorf("updateStateObject (%x) error: %v", addr[:], err))
 	}
@@ -572,6 +593,9 @@ func (s *StateDB) deleteStateObject(obj *stateObject) {
 	}
 	// Delete the account from the trie
 	addr := obj.Address()
+	if s.printInfo {
+		fmt.Println("DumpDelete: ", addr)
+	}
 	if err := s.trie.DeleteAccount(addr); err != nil {
 		s.setError(fmt.Errorf("deleteStateObject (%x) error: %v", addr[:], err))
 	}
@@ -626,6 +650,9 @@ func (s *StateDB) getDeletedStateObject(addr common.Address) *stateObject {
 	if data == nil {
 		start := time.Now()
 		var err error
+		if s.printInfo {
+			fmt.Println("DumpGet: ", addr)
+		}
 		data, err = s.trie.GetAccount(addr)
 		if metrics.EnabledExpensive {
 			s.AccountReads += time.Since(start)

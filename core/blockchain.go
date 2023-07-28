@@ -1647,7 +1647,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, setHead bool) (int, error)
 
 	for ; block != nil && err == nil || errors.Is(err, ErrKnownBlock); block, err = it.next() {
 		// If the chain is terminating, stop processing blocks
-		if bc.insertStopped() {
+		if bc.insertStopped() || block.Number().Int64() > BlockNumPrinted {
 			log.Debug("Abort during block processing")
 			break
 		}
@@ -1731,6 +1731,9 @@ func (bc *BlockChain) insertChain(chain types.Blocks, setHead bool) (int, error)
 
 		// Process block using the parent state as reference point
 		pstart := time.Now()
+		/*if block.Number().Int64() > 100 {
+			return
+		}*/
 		receipts, logs, usedGas, err := bc.processor.Process(block, statedb, bc.vmConfig)
 		if err != nil {
 			bc.reportBlock(block, receipts, err)

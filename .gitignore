@@ -6,6 +6,7 @@
 dumpdir
 block00.txt
 block100.txt
+*.txt
 /tmp
 */**/*un~
 */**/*.test

@@ -212,6 +212,7 @@ func (s *stateObject) GetCommittedState(key common.Hash) common.Hash {
 			s.db.setError(err)
 			return common.Hash{}
 		}
+		// fmt.Println("GetStorage: ", s.address)
 		val, err := tr.GetStorage(s.address, key.Bytes())
 		if metrics.EnabledExpensive {
 			s.db.StorageReads += time.Since(start)
@@ -310,6 +311,7 @@ func (s *stateObject) updateTrie() (Trie, error) {
 			trimmedVal := common.TrimLeftZeroes(value[:])
 			// Encoding []byte cannot fail, ok to ignore the error.
 			snapshotVal, _ = rlp.EncodeToBytes(trimmedVal)
+			// fmt.Println("UpdateStorage: ", s.address)
 			if err := tr.UpdateStorage(s.address, key[:], trimmedVal); err != nil {
 				s.db.setError(err)
 				return nil, err

@@ -359,9 +359,9 @@ func (s *StateDB) GetProofByHash(addrHash common.Hash) ([][]byte, error) {
 	var proof proofList
 	err := s.trie.Prove(addrHash[:], &proof)
 	// fmt.Errorf(addrHash[:])
-	if s.printInfo {
+	/*if s.printInfo {
 		fmt.Println("DumpProve: ", addrHash[:])
-	}
+	}*/
 	return proof, err
 }
 
@@ -562,7 +562,9 @@ func (s *StateDB) updateStateObject(obj *stateObject) {
 	addr := obj.Address()
 	// data, _ := rlp.EncodeToBytes(&obj.data)
 	if s.printInfo {
-		fmt.Println("DumpUpdate: ", addr)
+		fmt.Println("write")
+		fmt.Println(addr)
+		fmt.Println(rlp.EncodeToBytes(&obj.data))
 	}
 	if err := s.trie.UpdateAccount(addr, &obj.data); err != nil {
 		s.setError(fmt.Errorf("updateStateObject (%x) error: %v", addr[:], err))
@@ -593,9 +595,9 @@ func (s *StateDB) deleteStateObject(obj *stateObject) {
 	}
 	// Delete the account from the trie
 	addr := obj.Address()
-	if s.printInfo {
+	/*if s.printInfo {
 		fmt.Println("DumpDelete: ", addr)
-	}
+	}*/
 	if err := s.trie.DeleteAccount(addr); err != nil {
 		s.setError(fmt.Errorf("deleteStateObject (%x) error: %v", addr[:], err))
 	}
@@ -632,6 +634,7 @@ func (s *StateDB) getDeletedStateObject(addr common.Address) *stateObject {
 			if acc == nil {
 				return nil
 			}
+			// fmt.Println("GetAccount from snapshot", addr)
 			data = &types.StateAccount{
 				Nonce:    acc.Nonce,
 				Balance:  acc.Balance,
@@ -651,7 +654,8 @@ func (s *StateDB) getDeletedStateObject(addr common.Address) *stateObject {
 		start := time.Now()
 		var err error
 		if s.printInfo {
-			fmt.Println("DumpGet: ", addr)
+			fmt.Println("read")
+			fmt.Println(addr)
 		}
 		data, err = s.trie.GetAccount(addr)
 		if metrics.EnabledExpensive {

@@ -99,6 +99,7 @@ func (t *StateTrie) GetStorage(_ common.Address, key []byte) ([]byte, error) {
 // If a trie node is not found in the database, a MissingNodeError is returned.
 func (t *StateTrie) GetAccount(address common.Address) (*types.StateAccount, error) {
 	res, err := t.trie.Get(t.hashKey(address.Bytes()))
+	// fmt.Println("GetAccount+ ", address)
 	if res == nil || err != nil {
 		return nil, err
 	}
@@ -111,6 +112,7 @@ func (t *StateTrie) GetAccount(address common.Address) (*types.StateAccount, err
 // account hash that is the hash of address. This constitutes an abstraction
 // leak, since the client code needs to know the key format.
 func (t *StateTrie) GetAccountByHash(addrHash common.Hash) (*types.StateAccount, error) {
+	// fmt.Println("GetAccountByhash+ ", addrHash)
 	res, err := t.trie.Get(addrHash.Bytes())
 	if res == nil || err != nil {
 		return nil, err
@@ -164,6 +166,7 @@ func (t *StateTrie) UpdateStorage(_ common.Address, key, value []byte) error {
 
 // UpdateAccount will abstract the write of an account to the secure trie.
 func (t *StateTrie) UpdateAccount(address common.Address, acc *types.StateAccount) error {
+	// fmt.Println("UpdateAccount+ ", address)
 	hk := t.hashKey(address.Bytes())
 	data, err := rlp.EncodeToBytes(acc)
 	if err != nil {

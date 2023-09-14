@@ -1,9 +1,11 @@
 ## Go Ethereum Dump
 Experiment input generation for [The Locality of Memory Checking](https://eprint.iacr.org/2023/1358).
-The code is modified from the official go-ethereum repository.
+The code is modified from the [official go-ethereum repository](https://github.com/ethereum/go-ethereum).
 
 ## Instructions
+First install go, and download [raw block data](https://drive.google.com/drive/folders/1Q3ItZPFEZZAM-1wAnjsDdZy15UfbF8ir?usp=sharing) (first 4 million blocks) that is exported from ethereum. 
 ```
+mkdir ./dumpdir
 make geth
 ./build/bin/geth --datadir ./dumpdir import ~/Downloads/block00 >> eth00.txt
 ./build/bin/geth --datadir ./dumpdir import ~/Downloads/block01 >> eth01.txt
